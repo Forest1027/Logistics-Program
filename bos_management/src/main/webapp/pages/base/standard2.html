@@ -32,50 +32,21 @@
 					pageList: [30, 50, 100],
 					pagination: true,
 					toolbar: toolbar,
-					url: "../../data/standard.json",
+					url: "../../standard_pageQuery.action",
 					idField: 'id',
 					columns: columns
 				});
-				//保存时判断，所有信息是否都输入了
+
+				// 对收派标准 save按钮，添加click事件
 				$("#save").click(function() {
-					//判断是否表单中所有数据都填写了
+					// 判断是否form中所有表单对象 都是通过校验 
 					if($("#standardForm").form('validate')) {
+						// 通过校验 
 						$("#standardForm").submit();
 					} else {
-						$.messager.alert("Warning", "所有信息都必须填写", "warning");
+						$.messager.alert("警告", "表单中还存在需要一些非法内容", "warning");
 					}
 				});
-
-				$.extend($.fn.validatebox.defaults.rules, {
-					comLength: {
-
-						validator: function(value, param) {
-
-							return value.length >= param[0]&value.length<=param[1];
-
-						},
-
-						message: "收派标准名称长度为{0}-{1}位字符"
-
-					}
-
-				});
-				
-				$.extend($.fn.validatebox.defaults.rules, {
-					comVal: {
-
-						validator: function(value, param) {
-
-							return value >= param[0]&value<=param[1];
-
-						},
-
-						message: '大小为{0}-{1}'
-
-					}
-
-				});
-
 			});
 
 			//工具栏
@@ -91,21 +62,19 @@
 				text: '修改',
 				iconCls: 'icon-edit',
 				handler: function() {
-					alert('修改');
-				}
-			}, {
-				id: 'button-delete',
-				text: '作废',
-				iconCls: 'icon-cancel',
-				handler: function() {
-					alert('作废');
-				}
-			}, {
-				id: 'button-restore',
-				text: '还原',
-				iconCls: 'icon-save',
-				handler: function() {
-					alert('还原');
+					// 获取当前datagrid选中数据 
+					var rows = $("#grid").datagrid('getSelections');
+					if(rows.length != 1) {
+						// 没选 或 多选 
+						$.messager.alert("提示信息", "修改数据时，只能选中一行", "warning");
+					} else {
+						// 只选中一行 
+						var row = rows[0];
+						// 进行表单回显操作 
+						$("#standardForm").form('load', row);
+						// 显示窗口
+						$("#standardWindow").window('open');
+					}
 				}
 			}];
 
@@ -171,44 +140,44 @@
 				</div>
 			</div>
 
-			<div region="center" style="overflow:auto ;padding:5px; " border="false ">
+			<div region="center" style="overflow:auto;padding:5px;" border="false">
 
 				<form id="standardForm" action="../../standard_save.action" method="post">
-					<table class="table-edit " width="80% " align="center ">
-						<tr class="title ">
-							<td colspan="2 ">收派标准信息
+					<table class="table-edit" width="80%" align="center">
+						<tr class="title">
+							<td colspan="2">收派标准信息
 								<!--提供隐藏域 装载id -->
-								<input type="hidden" name="id " />
+								<input type="hidden" name="id" />
 							</td>
 						</tr>
 						<tr>
 							<td>收派标准名称</td>
 							<td>
-								<input type="text" name="name" class="easyui-validatebox" data-options="required:true,validType:'comLength[3,12]'" />
+								<input type="text" name="name" class="easyui-validatebox" data-options="required:true" />
 							</td>
 						</tr>
 						<tr>
 							<td>最小重量</td>
 							<td>
-								<input type="text" name="minWeight" class="easyui-numberbox" required="true" data-options="validType:'comVal[10,100]'"/> 
+								<input type="text" name="minWeight" class="easyui-numberbox" required="true" />
 							</td>
 						</tr>
 						<tr>
 							<td>最大重量</td>
 							<td>
-								<input type="text" name="maxWeight" class="easyui-numberbox" required="true" data-options="validType:'comVal[10,100]'"/>
+								<input type="text" name="maxWeight" class="easyui-numberbox" required="true" />
 							</td>
 						</tr>
 						<tr>
 							<td>最小长度</td>
 							<td>
-								<input type="text" name="minLength" class="easyui-numberbox" required="true" data-options="validType:'comVal[10,100]'"/>
+								<input type="text" name="minLength" class="easyui-numberbox" required="true" />
 							</td>
 						</tr>
 						<tr>
 							<td>最大长度</td>
 							<td>
-								<input type="text" name="maxLength" class="easyui-numberbox" required="true" data-options="validType:'comVal[10,100]'"/>
+								<input type="text" name="maxLength" class="easyui-numberbox" required="true" />
 							</td>
 						</tr>
 					</table>

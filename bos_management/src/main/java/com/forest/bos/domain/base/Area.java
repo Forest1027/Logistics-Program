@@ -14,7 +14,7 @@ import javax.persistence.Table;
  * @description:地域信息实体类，主要包含 省市区(县)
  */
 @Entity
-@Table(name = "T_AREA")
+@Table(name = "T_AREA",schema="bos")
 public class Area {
 
 	@Id
