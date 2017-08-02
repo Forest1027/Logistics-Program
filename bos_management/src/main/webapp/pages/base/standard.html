@@ -29,10 +29,10 @@
 					border: false,
 					rownumbers: true,
 					striped: true,
-					pageList: [30, 50, 100],
+					pageList: [10, 20, 50],
 					pagination: true,
 					toolbar: toolbar,
-					url: "../../data/standard.json",
+					url: "../../standard_pageQuery",
 					idField: 'id',
 					columns: columns
 				});
@@ -45,7 +45,8 @@
 						$.messager.alert("Warning", "所有信息都必须填写", "warning");
 					}
 				});
-
+				
+				//表单校验的附加功能-by Forest
 				$.extend($.fn.validatebox.defaults.rules, {
 					comLength: {
 
@@ -91,7 +92,17 @@
 				text: '修改',
 				iconCls: 'icon-edit',
 				handler: function() {
-					alert('修改');
+					//获取所有选中的记录
+					var rows = $("#grid").datagrid('getSelections');
+					//判断记录是否只有一条，如果不是-->弹出警告窗
+					if (rows.length!=1) {
+						$.messager.alert('警告','只能选择一条记录哦','warning');  
+					} else{
+						var row = rows[0];
+						$("#standardForm").form('load',row);
+						//显示窗口
+						$("#standardWindow").window('open');
+					}
 				}
 			}, {
 				id: 'button-delete',
@@ -150,7 +161,7 @@
 					width: 120,
 					align: 'center'
 				}, {
-					field: 'company',
+					field: 'operatingCompany',
 					title: '操作单位',
 					width: 120,
 					align: 'center'
@@ -178,7 +189,7 @@
 						<tr class="title ">
 							<td colspan="2 ">收派标准信息
 								<!--提供隐藏域 装载id -->
-								<input type="hidden" name="id " />
+								<input type="hidden" name="id" />
 							</td>
 						</tr>
 						<tr>
