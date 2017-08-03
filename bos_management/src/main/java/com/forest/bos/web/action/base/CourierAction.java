@@ -42,7 +42,8 @@ public class CourierAction extends ActionSupport implements ModelDriven<Courier>
 
 	@Autowired
 	private ICourierService cs;
-
+	
+	//分页
 	private int page;
 	private int rows;
 
@@ -52,6 +53,13 @@ public class CourierAction extends ActionSupport implements ModelDriven<Courier>
 
 	public void setRows(int rows) {
 		this.rows = rows;
+	}
+	
+	//批量删除
+	private String ids;
+
+	public void setIds(String ids) {
+		this.ids = ids;
 	}
 
 	@Override
@@ -124,6 +132,15 @@ public class CourierAction extends ActionSupport implements ModelDriven<Courier>
 		result.put("rows", page.getContent());
 		ActionContext.getContext().getValueStack().push(result);
 
+		return SUCCESS;
+	}
+	
+	@Action(value="courier_delBatch",results={@Result(name="success",type="redirect",location="/pages/base/courier.html")})
+	public String delBatch() {
+		//获取前台数据，切割字符串，还原id
+		String[] idArr = ids.split(",");
+		//调用后台，批量删除
+		cs.delBatch(idArr);
 		return SUCCESS;
 	}
 }

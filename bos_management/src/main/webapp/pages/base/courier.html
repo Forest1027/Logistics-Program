@@ -25,7 +25,23 @@
 			}
 
 			function doDelete() {
-				alert("删除...");
+				//获取勾选了的id
+				var rows = $("#grid").datagrid('getSelections');
+				//进行判断，如果没有勾选任何记录--->提示
+				if(rows.length == 0) {
+					//没选中数据
+					$.messager.alert('警告', '请至少选中一条记录', 'warning');
+				} else {
+					//选中数据
+					var array = new Array();
+					for(var i = 0; i < rows.length; i++) {
+						array.push(rows[i].id);
+					}
+					//将数组转换成字符串
+					var ids = array.join(",");
+					//将字符串发送服务器
+					window.location.href = "../../courier_delBatch?ids=" + ids;
+				}
 			}
 
 			function doRestore() {
@@ -117,9 +133,9 @@
 					width: 80,
 					align: 'center',
 					formatter: function(data, row, index) {
-						if(data == "0") {
+						if(data == null) {
 							return "正常使用"
-						} else {
+						} else if(data == "1") {
 							return "已作废";
 						}
 					}
@@ -149,7 +165,7 @@
 					border: false,
 					rownumbers: true,
 					striped: true,
-					pageList: [30, 50, 100],
+					pageList: [2, 4, 6],
 					pagination: true,
 					toolbar: toolbar,
 					url: "../../courier_pageQuery",
@@ -187,7 +203,7 @@
 					//将表单转换成键值对的json数据
 					var params = $("#searchForm").serializeJson();
 					//将条件带给datagrid(添加参数)
-					$("#grid").datagrid('load',params);
+					$("#grid").datagrid('load', params);
 					//关闭窗口
 					$("#searchWindow").window('close');
 				})

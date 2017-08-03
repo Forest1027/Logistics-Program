@@ -29,4 +29,13 @@ public class CourierServiceImp implements ICourierService{
 		Page<Courier> page = repository.findAll(specification,pageable);
 		return page;
 	}
+
+	@Override
+	public void delBatch(String[] idArr) {
+		//字符串-->数字
+		for (String idStr : idArr) {
+			Integer id = Integer.parseInt(idStr);
+			repository.updateDeltag(id);
+		}
+	}
 }
