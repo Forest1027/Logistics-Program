@@ -1,6 +1,11 @@
 package com.forest.bos.service.base.imp;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,5 +22,11 @@ public class CourierServiceImp implements ICourierService{
 	@Override
 	public void save(Courier courier) {
 		repository.save(courier);
+	}
+
+	@Override
+	public Page<Courier> pageQuery(Specification<Courier> specification, Pageable pageable) {
+		Page<Courier> page = repository.findAll(specification,pageable);
+		return page;
 	}
 }

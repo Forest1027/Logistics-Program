@@ -52,6 +52,13 @@
 				text: '还原',
 				iconCls: 'icon-save',
 				handler: doRestore
+			}, {
+				id: 'button-search',
+				text: '查询',
+				iconCls: 'icon-search',
+				handler: function() {
+					$("#searchWindow").window('open');
+				}
 			}];
 			// 定义列
 			var columns = [
@@ -162,16 +169,8 @@
 					resizable: false
 				});
 
-				
-
-			});
-
-			function doDblClickRow() {
-				alert("双击表格数据...");
-			}
-			$(function() {
 				//保存快递员信息绑定点击事件
-				$("#save").click(function(){
+				$("#save").click(function() {
 					alert("baocun")
 					if($("#courierId").form('validate')) {
 						alert("成功")
@@ -182,7 +181,38 @@
 						$.messager.alert('警告', '所有信息都需填写', 'warning');
 					}
 				})
-			})
+
+				//查询操作的点击事件
+				$("#searchBtn").click(function() {
+					//将表单转换成键值对的json数据
+					var params = $("#searchForm").serializeJson();
+					//将条件带给datagrid(添加参数)
+					$("#grid").datagrid('load',params);
+					//关闭窗口
+					$("#searchWindow").window('close');
+				})
+			});
+
+			function doDblClickRow() {
+				alert("双击表格数据...");
+			}
+			$.fn.serializeJson = function() {
+				var serializeObj = {};
+				var array = this.serializeArray();
+				var str = this.serialize();
+				$(array).each(function() {
+					if(serializeObj[this.name]) {
+						if($.isArray(serializeObj[this.name])) {
+							serializeObj[this.name].push(this.value);
+						} else {
+							serializeObj[this.name] = [serializeObj[this.name], this.value];
+						}
+					} else {
+						serializeObj[this.name] = this.value;
+					}
+				});
+				return serializeObj;
+			};
 		</script>
 	</head>
 

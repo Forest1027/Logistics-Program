@@ -22,6 +22,7 @@
 		<welcome-file>default.htm</welcome-file>
 		<welcome-file>default.jsp</welcome-file>
 	</welcome-file-list>
+	
 	<!-- struts2的过滤器 -->
 	<filter>
 		<filter-name>struts2Filter</filter-name>
