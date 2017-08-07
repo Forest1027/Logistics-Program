@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @description:客户信息表
@@ -16,6 +17,7 @@ import javax.persistence.TemporalType;
  */
 @Entity
 @Table(name = "T_CUSTOMER")
+@XmlRootElement(name="customer")
 public class Customer {
 	@Id
 	@GeneratedValue()
@@ -47,7 +49,7 @@ public class Customer {
 	@Column(name = "C_EMAIL")
 	private String email; // 邮箱
 	@Column(name = "C_Fixed_AREA_ID")
-	private String fixedAreaId; // 定区编码
+	private String fixedAreaId; // 定区编码-->外键
 
 	public Integer getId() {
 		return id;
