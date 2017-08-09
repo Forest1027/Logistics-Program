@@ -1,5 +1,7 @@
 package com.forest.bos.service.base;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,5 +15,7 @@ public interface ICourierService {
 	public Page<Courier> pageQuery(Specification<Courier> specification,Pageable pageable);
 
 	public void delBatch(String[] idArr);
+
+	public List<Courier> findNoAssociation();
 
 }

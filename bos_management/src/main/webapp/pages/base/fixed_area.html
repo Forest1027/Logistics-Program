@@ -33,7 +33,39 @@
 			}
 
 			function doAssociations() {
-				$('#customerWindow').window('open');
+				//判断选中的记录是否为一条
+				var rows = $("#grid").datagrid("getSelections");
+				if(rows.length == 1) {
+					//并且将选中的记录的地区id填入表单隐藏域中
+					$("#customerFixedAreaId").val(rows[0].id);
+					// 显示进度条
+					$.messager.progress({
+						interval: 500 // 每0.5秒加载10%, 5秒加载完
+					});
+					//发送ajax请求
+					$.post("../../fixedArea_findNoAssosnCustomers.action", function(data) {
+						$("#noassociationSelect").empty();
+						$(data).each(function() {
+								var option = $("<option value='" + this.id + "'>" + this.username + "(" + this.address + ")" + "</option>")
+								$("#noassociationSelect").append(option);
+							})
+							// 请求结束后，关闭进度条
+						$.messager.progress('close');
+						// 弹出关联窗口 
+						$('#customerWindow').window('open');
+					}, "json");
+					$.post("../../fixedArea_findAssosnCustomers.action", {
+						"id": rows[0].id
+					}, function(data) {
+						$("#associationSelect").empty();
+						$(data).each(function() {
+							var option = $("<option value='" + this.id + "'>" + this.username + "(" + this.address + ")" + "</option>")
+							$("#associationSelect").append(option);
+						})
+					}, "json");
+				} else {
+					$.messager.alert("警告", "请选择并只能选择一条", "warning");
+				}
 			}
 
 			//工具栏
@@ -73,6 +105,8 @@
 						// 只选择了一个定区
 						// 弹出定区关联快递员 窗口 
 						$("#courierWindow").window('open');
+						//将定区id填入隐藏域
+						$("#courierFixedAreaId").val(rows[0].id);
 					} else {
 						// 没有选中定区，或者选择 了多个定区
 						$.messager.alert("警告", "关联快递员,只能（必须）选择一个定区", "warning");
@@ -92,7 +126,7 @@
 					title: '定区编号',
 					width: 120,
 					align: 'center',
-					formatter:function(value,row,index) {
+					formatter: function(value, row, index) {
 						return row.id;
 					}
 				}, {
@@ -165,7 +199,7 @@
 					//将表单数据序列化
 					var params = $("#searchForm").serializeJson();
 					//绑定到datagrid上
-					$("#grid").datagrid('load',params);
+					$("#grid").datagrid('load', params);
 					//窗口关闭
 					$("#searchWindow").window('close');
 				});
@@ -180,8 +214,33 @@
 						$.messager.alert('警告', '所有数据都必须填写', 'warning');
 					}
 
-				})
+				});
 
+				//关联客户，向左向右移
+				$("#toRight").click(function() {
+					$("#associationSelect").append($("#noassociationSelect option:selected"));
+				})
+				$("#toLeft").click(function() {
+					$("#noassociationSelect").append($("#associationSelect option:selected"));
+				});
+
+				//点击关联客户的按钮，提交表单
+				$("#associationBtn").click(function() {
+					//将已关联定区的所有选项选中
+					$("#associationSelect option").attr("selected", "selected");
+					//提交
+					$("#customerForm").submit();
+				});
+				
+				//绑定点击事件
+				$("#associationCourierBtn").click(function() {
+					//判断表单是否通过校验
+					if($("#courierForm").form('validate')) {
+						$("#courierForm").submit();
+					}else {
+						$.messager.alert('警告','表单中存在非法数据','warning');
+					}
+				});
 			});
 
 			function doDblClickRow() {
@@ -410,9 +469,9 @@
 		</div>
 
 		<!-- 关联客户窗口 -->
-		<div class="easyui-window" title="关联客户窗口" id="customerWindow" collapsible="false" closed="true" minimizable="false" maximizable="false" style="top:20px;left:200px;width: 400px;height: 300px;">
+		<div class="easyui-window" title="关联客户窗口" id="customerWindow" collapsible="false" closed="true" minimizable="false" maximizable="false" style="top:20px;left:200px;width: 500px;height: 300px;" modal="true">
 			<div style="overflow:auto;padding:5px;" border="false">
-				<form id="customerForm" action="../../decidedzone_assigncustomerstodecidedzone.action" method="post">
+				<form id="customerForm" action="../../fixedArea_assosnCustomerToFixedArea.action" method="post">
 					<table class="table-edit" width="80%" align="center">
 						<tr class="title">
 							<td colspan="3">关联客户</td>
@@ -420,7 +479,7 @@
 						<tr>
 							<td>
 								<input type="hidden" name="id" id="customerFixedAreaId" />
-								<select id="noassociationSelect" multiple="multiple" size="10"></select>
+								<select id="noassociationSelect" multiple="multiple" size="10" style="width: 200px;"></select>
 							</td>
 							<td>
 								<input type="button" value="》》" id="toRight">
@@ -428,7 +487,7 @@
 								<input type="button" value="《《" id="toLeft">
 							</td>
 							<td>
-								<select id="associationSelect" name="customerIds" multiple="multiple" size="10"></select>
+								<select id="associationSelect" name="customerIds" multiple="multiple" size="10" style="width: 200px;"></select>
 							</td>
 						</tr>
 						<tr>
@@ -454,13 +513,13 @@
 							<td>
 								<!-- 存放定区编号 -->
 								<input type="hidden" name="id" id="courierFixedAreaId" />
-								<input type="text" name="courierId" class="easyui-combobox" required="true" />
+								<input type="text" name="courierId" class="easyui-combobox" required="true" data-options="url:'../../courier_findnoassociation.action',valueField:'id',textField:'info'" />
 							</td>
 						</tr>
 						<tr>
 							<td>选择收派时间</td>
 							<td>
-								<input type="text" name="takeTimeId" class="easyui-combobox" required="true" />
+								<input type="text" name="takeTimeId" class="easyui-combobox" required="true" data-options="url:'../../taketime_findAll',valueField:'id',textField:'name'" />
 							</td>
 						</tr>
 						<tr>

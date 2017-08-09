@@ -143,4 +143,11 @@ public class CourierAction extends ActionSupport implements ModelDriven<Courier>
 		cs.delBatch(idArr);
 		return SUCCESS;
 	}
+	
+	@Action(value="courier_findnoassociation",results={@Result(name="success",type="json")})
+	public String findNoAssociation() {
+		List<Courier> couriers = cs.findNoAssociation();
+		ActionContext.getContext().getValueStack().push(couriers);
+		return SUCCESS;
+	}
 }
