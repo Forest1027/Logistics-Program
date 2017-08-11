@@ -12,9 +12,9 @@ import javax.mail.internet.MimeMessage.RecipientType;
 public class MailUtils {
 	private static String smtp_host = "smtp.163.com";
 	private static String username = "kiwilettuce@163.com";
-	private static String password = "1994";
+	private static String password = "forest666";
 	private static String from = "kiwilettuce@163.com";
-	private static String activeUrl = "";
+	public static String activeUrl = "http://localhost:9003/bos_fore/customer_activeMail";
 
 	public static void sendMail(String subject, String content, String to,
 			String activecode) {
