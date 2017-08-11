@@ -50,4 +50,20 @@ public class CustomerServiceImpl implements ICustomerService{
 		}
 	}
 
+	@Override
+	public void regist(Customer customer) {
+		System.out.println(customer);
+		repository.save(customer);
+	}
+
+	@Override
+	public Customer findByTelephone(String telephone) {
+		return repository.findByTelephone(telephone);
+	}
+
+	@Override
+	public void updateByTelephone(String telephone) {
+		repository.updateType(telephone);
+	}
+
 }
