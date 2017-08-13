@@ -22,7 +22,16 @@
 		<welcome-file>default.htm</welcome-file>
 		<welcome-file>default.jsp</welcome-file>
 	</welcome-file-list>
-	
+
+	<servlet>
+		<servlet-name>CXFService</servlet-name>
+		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CXFService</servlet-name>
+		<url-pattern>/services/*</url-pattern>
+	</servlet-mapping>
 	<!-- struts2的过滤器 -->
 	<filter>
 		<filter-name>struts2Filter</filter-name>
@@ -30,6 +39,8 @@
 	</filter>
 	<filter-mapping>
 		<filter-name>struts2Filter</filter-name>
-		<url-pattern>/*</url-pattern>
+		<url-pattern>*.action</url-pattern>
 	</filter-mapping>
+	<!-- WebServicede -->
+
 </web-app>
