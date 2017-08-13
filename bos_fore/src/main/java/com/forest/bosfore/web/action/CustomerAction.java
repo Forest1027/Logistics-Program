@@ -3,6 +3,10 @@ package com.forest.bosfore.web.action;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import javax.jms.JMSException;
+import javax.jms.MapMessage;
+import javax.jms.Message;
+import javax.jms.Session;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang.RandomStringUtils;
@@ -13,8 +17,11 @@ import org.apache.struts2.convention.annotation.Namespace;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Controller;
 
 import com.forest.bosfore.web.action.common.BaseAction;
@@ -27,16 +34,30 @@ import com.opensymphony.xwork2.ActionContext;
 @Controller
 @Scope("prototype")
 public class CustomerAction extends BaseAction<Customer> {
+	@Autowired
+	@Qualifier("jmsQueueTemplate")
+	private JmsTemplate jmsTemplate;
+	
 	@Action(value = "customer_sendSms")
 	public String sendSms() {
 		// 生成验证码.注意此处使用randomNumeric方法，不然生成的是奇怪的汉字
 		String checkCode = RandomStringUtils.randomNumeric(4);
 		// 与手机号一起保存至session中
 		ServletActionContext.getRequest().getSession().setAttribute(model.getTelephone(), checkCode);
-		// 编辑短信内容
-		String msg = "您好，本次获取的验证码为" + checkCode;
-		System.out.println(msg);
-		// 发送短信，获取对应的结果
+		//将信息发送给activemq
+		jmsTemplate.send("bos_sms", new MessageCreator() {
+			
+			@Override
+			public Message createMessage(Session session) throws JMSException {
+				//要传两个参数，因此要使用mapmessage
+				MapMessage mapMessage = session.createMapMessage();
+				mapMessage.setString("telephone", model.getTelephone());
+				mapMessage.setString("checkcode", checkCode);
+				return mapMessage;
+			}
+		});
+		
+		/*// 发送短信，获取对应的结果
 		String result = "000/yyy";
 		// 根据结果，判断是否发送成功
 		if (result.startsWith("000")) {
@@ -44,7 +65,8 @@ public class CustomerAction extends BaseAction<Customer> {
 			return NONE;
 		} else {
 			throw new RuntimeException("发送失败，信息码：" + result);
-		}
+		}*/
+		return NONE;
 	}
 
 	private String checkCode;

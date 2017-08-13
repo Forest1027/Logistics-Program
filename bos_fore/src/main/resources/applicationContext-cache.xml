@@ -38,14 +38,14 @@
     </bean>  
 	
 	<!-- jedis连接工厂 -->
-	<bean id="connectionFactory"  
+	<bean id="cacheConnectionFactory"  
         class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"  
         p:host-name="localhost" p:port="6379" p:pool-config-ref="poolConfig"  
         p:database="0" />  
      
     <!-- Spring data提供的redis模板 -->  
     <bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">  
-        <property name="connectionFactory" ref="connectionFactory" /> 
+        <property name="connectionFactory" ref="cacheConnectionFactory" /> 
         <property name="keySerializer">
             <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
         </property>
