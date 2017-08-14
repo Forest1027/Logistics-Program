@@ -1,5 +1,7 @@
 package com.forest.bos.service.take_delivery.imp;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +39,16 @@ public class PromotionServiceImp implements IPromotionService{
 		pageBean.setTotalCount(pageData.getTotalElements());
 		pageBean.setRows(pageData.getContent());
 		return pageBean;
+	}
+
+	@Override
+	public Promotion findById(Integer id) {
+		return repository.findOne(id);
+	}
+
+	@Override
+	public void updateStatus(Date date) {
+		repository.updateStatus(date);
 	}
 
 }

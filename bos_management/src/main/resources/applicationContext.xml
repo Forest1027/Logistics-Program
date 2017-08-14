@@ -84,4 +84,27 @@
 			<bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"></bean>
 		</jaxrs:outInterceptors>
 	</jaxrs:server>
+	
+	<!-- Quartz相关配置 -->
+	<!-- job -->
+	<bean id="promotionJob"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.forest.quartz.take_delivery.PromotionJob"></property>
+	</bean>
+	<!-- trigger -->
+	<bean id="simpleTrigger"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="promotionJob"></property>
+		<property name="startDelay" value="0"></property>
+		<property name="repeatInterval" value="60000"></property>
+	</bean>
+	<!-- schedule -->
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="jobFactory" ref="jobFactory"></property>
+		<property name="triggers">
+			<list>
+				<ref bean="simpleTrigger"></ref>
+			</list>
+		</property>
+	</bean>
 </beans>
