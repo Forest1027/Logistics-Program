@@ -1,7 +1,6 @@
 package com.forest.quartz.take_delivery;
 
 import java.util.Date;
-
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
