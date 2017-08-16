@@ -29,7 +29,7 @@
 										<span ng-show="item.status == '1'">进行中</span>
 										<span ng-show="item.status == '2'">已结束</span>
 									</p>
-									<p class="text-right grey">{{item.startDate}}—{{item.endDate}}</p>
+									<p class="text-right grey">{{item.startDate.replace("T", " ")}}—{{item.endDate.replace("T", " ")}}</p>
 									<p class="text-right grey">{{item.activeScope}}</p>
 								</div>
 							</div>

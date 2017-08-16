@@ -24,6 +24,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Controller;
 
+import com.forest.bos.domain.common.Constants;
 import com.forest.bosfore.web.action.common.BaseAction;
 import com.forest.bosfore.web.utils.MailUtils;
 import com.forest.crm.domain.Customer;
@@ -37,35 +38,31 @@ public class CustomerAction extends BaseAction<Customer> {
 	@Autowired
 	@Qualifier("jmsQueueTemplate")
 	private JmsTemplate jmsTemplate;
-	
+
 	@Action(value = "customer_sendSms")
 	public String sendSms() {
 		// 生成验证码.注意此处使用randomNumeric方法，不然生成的是奇怪的汉字
 		String checkCode = RandomStringUtils.randomNumeric(4);
 		// 与手机号一起保存至session中
 		ServletActionContext.getRequest().getSession().setAttribute(model.getTelephone(), checkCode);
-		//将信息发送给activemq
+		// 将信息发送给activemq
 		jmsTemplate.send("bos_sms", new MessageCreator() {
-			
+
 			@Override
 			public Message createMessage(Session session) throws JMSException {
-				//要传两个参数，因此要使用mapmessage
+				// 要传两个参数，因此要使用mapmessage
 				MapMessage mapMessage = session.createMapMessage();
 				mapMessage.setString("telephone", model.getTelephone());
 				mapMessage.setString("checkcode", checkCode);
 				return mapMessage;
 			}
 		});
-		
-		/*// 发送短信，获取对应的结果
-		String result = "000/yyy";
-		// 根据结果，判断是否发送成功
-		if (result.startsWith("000")) {
-			// 发送成功
-			return NONE;
-		} else {
-			throw new RuntimeException("发送失败，信息码：" + result);
-		}*/
+
+		/*
+		 * // 发送短信，获取对应的结果 String result = "000/yyy"; // 根据结果，判断是否发送成功 if
+		 * (result.startsWith("000")) { // 发送成功 return NONE; } else { throw new
+		 * RuntimeException("发送失败，信息码：" + result); }
+		 */
 		return NONE;
 	}
 
@@ -131,18 +128,38 @@ public class CustomerAction extends BaseAction<Customer> {
 							+ model.getTelephone())
 					.accept(MediaType.APPLICATION_JSON).get(Customer.class);
 			// 判断邮箱激活状态
-			if (customer.getType()==null||customer.getType() != 1) {
+			if (customer.getType() == null || customer.getType() != 1) {
 				// 未激活--->调用webclient
-				WebClient.create("http://localhost:9002/crm_management/services/customerService/regist/updateType/"
-						+ model.getTelephone()).put(null);
+				WebClient
+						.create(Constants.CRM_MANAGEMENT_URL
+								+ "/crm_management/services/customerService/regist/updateType/" + model.getTelephone())
+						.put(null);
 				ServletActionContext.getResponse().getWriter().println("绑定成功！");
 			} else {
 				// 已激活
 				ServletActionContext.getResponse().getWriter().println("已经绑定，请勿重复绑定！");
 			}
-			//移除redis中的此条激活码
+			// 移除redis中的此条激活码
 			template.delete(model.getTelephone());
 		}
 		return NONE;
+	}
+
+	@Action(value = "customer_login", results = {
+			@Result(name = "success", type = "redirect", location = "/index.html#/myhome"),
+			@Result(name = "login", type = "redirect", location = "login.html") })
+	public String login() {
+		// 将帐户名和密码传递给crm，查找customer
+		Customer customer = WebClient
+				.create(Constants.CRM_MANAGEMENT_URL + "/crm_management/services/customerService/login?telephone="
+						+ model.getTelephone() + "&password=" + model.getPassword())
+				.accept(MediaType.APPLICATION_JSON).get(Customer.class);
+		// 如果customer为空-->登录失败
+		if (customer == null) {
+			return LOGIN;
+		} else {
+			// 否则-->登录成功
+			return SUCCESS;
+		}
 	}
 }
