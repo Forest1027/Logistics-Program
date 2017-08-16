@@ -66,4 +66,9 @@ public class CustomerServiceImpl implements ICustomerService{
 		repository.updateType(telephone);
 	}
 
+	@Override
+	public Customer login(String telephone, String password) {
+		return repository.findByTelephoneAndPassword(telephone,password);
+	}
+
 }
