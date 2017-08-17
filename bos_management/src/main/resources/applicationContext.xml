@@ -85,6 +85,19 @@
 		</jaxrs:outInterceptors>
 	</jaxrs:server>
 	
+	<jaxrs:server id="orderService" address="/orderService">
+		<!-- 服务实现类 -->
+		<jaxrs:serviceBeans>
+			<bean class="com.forest.bos.service.take_delivery.imp.OrderServiceImp" />
+		</jaxrs:serviceBeans>
+		<jaxrs:inInterceptors>
+			<bean class="org.apache.cxf.interceptor.LoggingInInterceptor"></bean>
+		</jaxrs:inInterceptors>
+		<jaxrs:outInterceptors>
+			<bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"></bean>
+		</jaxrs:outInterceptors>
+	</jaxrs:server>
+	
 	<!-- Quartz相关配置 -->
 	<!-- job -->
 	<bean id="promotionJob"
