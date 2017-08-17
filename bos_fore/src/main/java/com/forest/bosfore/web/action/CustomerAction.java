@@ -159,6 +159,7 @@ public class CustomerAction extends BaseAction<Customer> {
 			return LOGIN;
 		} else {
 			// 否则-->登录成功
+			ServletActionContext.getRequest().getSession().setAttribute("customer", customer);
 			return SUCCESS;
 		}
 	}

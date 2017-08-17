@@ -18,8 +18,8 @@ bosfore_app.controller("ctrlRead", ['$scope', '$http', function($scope, $http) {
 
 	$scope.selectPage = function(page) {
 		// 如果页码超出范围
-		if($scope.totalPages != 0) {
-			if(page < 1 || page > $scope.totalPages) return;
+		if($scope.totalPages != 0&&(page < 1 || page > $scope.totalPages)) {
+			return;
 		}
 
 		$http({
