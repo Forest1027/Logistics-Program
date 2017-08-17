@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import com.forest.bos.domain.base.Area;
 import com.forest.bos.domain.base.Courier;
@@ -23,6 +24,7 @@ import com.forest.bos.domain.base.Courier;
  */
 @Entity
 @Table(name = "T_ORDER")
+@XmlRootElement(name="order")
 public class Order {
 	@Id
 	@GeneratedValue
