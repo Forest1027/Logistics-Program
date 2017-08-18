@@ -71,4 +71,9 @@ public class CustomerServiceImpl implements ICustomerService{
 		return repository.findByTelephoneAndPassword(telephone,password);
 	}
 
+	@Override
+	public String findFixedAreaByAddress(String address) {
+		return repository.findFixedAreaIdByAddress(address);
+	}
+
 }

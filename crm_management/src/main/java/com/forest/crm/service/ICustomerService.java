@@ -55,5 +55,11 @@ public interface ICustomerService {
 	@GET
 	@Produces({ "application/xml", "application/json" })
 	public Customer login(@QueryParam("telephone") String telephone, @QueryParam("password") String password);
-
+	
+	//通过地址查询定区id
+	@Path("/findFixedAreaByAddress/{address}")
+	@GET
+	@Consumes({ "application/xml", "application/json" })
+	@Produces({ "application/xml", "application/json" })
+	public String findFixedAreaByAddress(@PathParam("address") String address);
 }

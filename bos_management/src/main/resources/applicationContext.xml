@@ -120,4 +120,7 @@
 			</list>
 		</property>
 	</bean>
+	
+	<!-- 引入ActiveMQ的配置 -->
+	<import resource="applicationContext-mq.xml"/>
 </beans>

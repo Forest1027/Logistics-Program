@@ -33,8 +33,16 @@ public class OrderAction extends BaseAction<Order> {
 		this.recAreaInfo = recAreaInfo;
 	}
 
-	@Action(value = "order_add", results = { @Result(name = "success", type = "redirect", location = "/index.html") })
+	@Action(value = "order_add", results = { @Result(name = "success", type = "redirect", location = "/index.html"),
+			@Result(name = "login", type = "redirect", location = "/login.html") })
 	public String add() {
+		//获取当前域中的客户
+		Customer customer = (Customer) ServletActionContext.getRequest().getSession().getAttribute("customer");
+		//判断客户是否登录
+		if(customer==null||"".equals(customer)) {
+			return LOGIN;
+		}
+		
 		// 将获取到的地址切分成省市区
 		String[] sendAreaData = sendAreaInfo.split("/");
 		String[] recAreaData = recAreaInfo.split("/");
@@ -49,19 +57,19 @@ public class OrderAction extends BaseAction<Order> {
 		recArea.setProvince(recAreaData[0]);
 		recArea.setCity(recAreaData[1]);
 		recArea.setDistrict(recAreaData[2]);
-
 		// 将Area存进model
 		model.setSendArea(sendArea);
 		model.setRecArea(recArea);
-		
-		//关联当前客户
-		Customer customer = (Customer)ServletActionContext.getRequest().getSession().getAttribute("customer");
+
+		// 关联当前客户
 		model.setCustomer_id(customer.getId());
 		
+		System.out.println(model);
+
 		// 利用webservice将model传给bos_management保存
 		WebClient.create(Constants.BOS_MANAGEMENT_URL + "/bos_management/services/orderService/addOrder")
-				.type(MediaType.APPLICATION_JSON).post(Order.class);
-		
+				.type(MediaType.APPLICATION_JSON).post(model);
+
 		return SUCCESS;
 	}
 }
