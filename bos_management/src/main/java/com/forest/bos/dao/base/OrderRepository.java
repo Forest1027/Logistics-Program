@@ -6,4 +6,6 @@ import com.forest.bos.domain.take_delivery.Order;
 
 public interface OrderRepository extends JpaRepository<Order, Integer>{
 
+	public Order findByOrderNum(String orderNum);
+
 }

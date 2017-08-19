@@ -148,4 +148,9 @@ public class OrderServiceImp implements IOrderService {
 		// 修改工单状态
 		workBill.setPickstate("已通知");
 	}
+
+	@Override
+	public Order findByOrderNum(String orderNum) {
+		return oRepository.findByOrderNum(orderNum);
+	}
 }
