@@ -68,7 +68,7 @@
 			// 定义列
 			var columns = [
 				[{
-					field: 'id',
+					field: 'wayBillNum',
 					title: '工作单号',
 					width: 120,
 					align: 'center',
@@ -79,7 +79,7 @@
 						}
 					}
 				}, {
-					field: 'arrivecity',
+					field: 'arriveCity',
 					title: '到达地',
 					width: 120,
 					align: 'center',
@@ -90,7 +90,7 @@
 						}
 					}
 				}, {
-					field: 'product',
+					field: 'goodsType',
 					title: '产品',
 					width: 120,
 					align: 'center',
@@ -149,10 +149,10 @@
 					border: true,
 					rownumbers: true,
 					striped: true,
-					pageList: [30, 50, 100],
+					pageList: [5, 10, 15],
 					pagination: true,
 					toolbar: toolbar,
-					url: "../../way_pageQuery.action",
+					url: "../../waybill_pageQuery.action",
 					idField: 'id',
 					columns: columns,
 					onDblClickRow: doDblClickRow,
@@ -165,12 +165,13 @@
 									title: "提示窗口",
 									msg: data.msg
 								});
+								//将index在刷新列表前置为undefined，不然没有效果
+								editIndex = undefined;
 								//刷新列表
 								$("#grid").datagrid("reload");
 							}
 						});
 						console.info(rowData);
-						editIndex = undefined;
 					}
 				});
 			});

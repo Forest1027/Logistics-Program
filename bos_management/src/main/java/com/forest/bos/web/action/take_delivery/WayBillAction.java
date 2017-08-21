@@ -57,10 +57,10 @@ public class WayBillAction extends BaseAction<WayBill> {
 		return SUCCESS;
 	}
 
-	@Action(value = "way_pageQuery", results = { @Result(name = "success", type = "json") })
+	@Action(value = "waybill_pageQuery", results = { @Result(name = "success", type = "json") })
 	public String pageQuery() {
 		// 加了一个降序查询
-		Pageable pageable = new PageRequest(page - 1, rows, new Sort(new Sort.Order(Sort.Direction.DESC, "id")));
+		Pageable pageable = new PageRequest(page - 1, rows, new Sort(new Sort.Order(Sort.Direction.DESC, "wayBillNum")));
 		// 调用业务层查询
 		Page<WayBill> page = wbService.pageQuery(pageable);
 		// 将数据存进值栈
@@ -78,7 +78,7 @@ public class WayBillAction extends BaseAction<WayBill> {
 		} else {
 			result.put("success", false);
 		}
-		ServletActionContext.getContext().getValueStack().push(wayBill);
+		ServletActionContext.getContext().getValueStack().push(result);
 		return SUCCESS;
 	}
 }

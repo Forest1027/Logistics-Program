@@ -1,5 +1,7 @@
 package com.forest.bosfore.web.action;
 
+import java.util.UUID;
+
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -60,7 +62,9 @@ public class OrderAction extends BaseAction<Order> {
 		// 将Area存进model
 		model.setSendArea(sendArea);
 		model.setRecArea(recArea);
-
+		//生成订单号
+		UUID uuid = UUID.randomUUID();
+		model.setOrderNum(uuid.toString());
 		// 关联当前客户
 		model.setCustomer_id(customer.getId());
 		
@@ -69,7 +73,6 @@ public class OrderAction extends BaseAction<Order> {
 		// 利用webservice将model传给bos_management保存
 		WebClient.create(Constants.BOS_MANAGEMENT_URL + "/bos_management/services/orderService/addOrder")
 				.type(MediaType.APPLICATION_JSON).post(model);
-
 		return SUCCESS;
 	}
 }
