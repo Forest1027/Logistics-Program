@@ -62,7 +62,7 @@ public class WayBillAction extends BaseAction<WayBill> {
 		// 加了一个降序查询
 		Pageable pageable = new PageRequest(page - 1, rows, new Sort(new Sort.Order(Sort.Direction.DESC, "wayBillNum")));
 		// 调用业务层查询
-		Page<WayBill> page = wbService.pageQuery(pageable);
+		Page<WayBill> page = wbService.pageQuery(model,pageable);
 		// 将数据存进值栈
 		pushDataToValueStack(page);
 		return SUCCESS;

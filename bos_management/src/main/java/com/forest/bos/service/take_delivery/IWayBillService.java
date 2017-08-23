@@ -11,4 +11,6 @@ public interface IWayBillService {
 	public Page<WayBill> pageQuery(Pageable pageable);
 
 	public WayBill findByWayBillNum(String wayBillNum);
+
+	public Page<WayBill> pageQuery(WayBill model, Pageable pageable);
 }
