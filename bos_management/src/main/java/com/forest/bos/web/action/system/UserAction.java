@@ -38,4 +38,12 @@ public class UserAction extends BaseAction<User>{
 			return LOGIN;
 		}
 	}
+	
+	@Action(value="user_logout",results={@Result(name="success",type="redirect",location="/login.html")})
+	public String logout() {
+		Subject subject = SecurityUtils.getSubject();
+		subject.logout();
+		System.out.println("用戶退出登录啦---------------");
+		return SUCCESS;
+	}
 }

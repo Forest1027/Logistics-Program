@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.apache.struts2.json.annotations.JSON;
+
 /**
  * @description:权限名称
  */
@@ -20,7 +22,7 @@ public class Permission {
 	@Id
 	@GeneratedValue
 	@Column(name = "C_ID")
-	private int id;
+	private Integer id;
 	@Column(name = "C_NAME")
 	private String name; // 权限名称
 	@Column(name = "C_KEYWORD")
@@ -31,11 +33,11 @@ public class Permission {
 	@ManyToMany(mappedBy = "permissions")
 	private Set<Role> roles = new HashSet<Role>(0);
 
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -54,7 +56,8 @@ public class Permission {
 	public void setKeyword(String keyword) {
 		this.keyword = keyword;
 	}
-
+	
+	@JSON(serialize=false)
 	public Set<Role> getRoles() {
 		return roles;
 	}

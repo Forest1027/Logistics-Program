@@ -35,7 +35,7 @@
 				};
 				
 				$.ajax({
-					url : '../../data/menu.json',
+					url : '../../menu_list.action',
 					type : 'POST',
 					dataType : 'text',
 					success : function(data) {
@@ -53,6 +53,16 @@
 				$('#save').click(function(){
 					location.href='role.html';
 				});
+				
+				//权限选择
+				$.post("../../permission_list.action",function(data) {
+					$(data).each(function() {
+						var checkbox = $("<input type='checkbox' name='permissionIds' />");
+						checkbox.val(this.id);
+						$("#permissiontTD").append(checkbox);
+						$("#permissiontTD").append(this.name);
+					})
+				})
 			});
 		</script>
 	</head>
@@ -89,10 +99,8 @@
 					</tr>
 					<tr>
 						<td>权限选择</td>
-						<td>
-							<input type="checkbox" name="permissionIds" value="1" /> 添加快递员 
-							<input type="checkbox" name="permissionIds" value="2" /> 快递员列表查询
-							<input type="checkbox" name="permissionIds" value="3" /> 添加区域 
+						<td id="permissiontTD">
+							
 						</td>
 					</tr>
 					<tr>
