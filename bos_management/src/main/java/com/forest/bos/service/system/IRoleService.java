@@ -11,4 +11,6 @@ public interface IRoleService {
 
 	public List<Role> findAll();
 
+	public void save(Role model, String[] permissionIds, String menuIds);
+
 }

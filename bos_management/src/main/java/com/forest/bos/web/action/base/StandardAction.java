@@ -60,7 +60,6 @@ public class StandardAction extends ActionSupport implements ModelDriven<Standar
 
 	@Action(value = "standard_pageQuery", results = { @Result(name = "success", type = "json") })
 	public String query() {
-		System.out.println("query");
 		// 将接收的两个参数传递给业务层，调用业务层方法获取数据
 		// PageRequest是Pageable的实现类--->下面是多态
 		Pageable pageable = new PageRequest(page - 1, rows);
@@ -73,12 +72,11 @@ public class StandardAction extends ActionSupport implements ModelDriven<Standar
 		return SUCCESS;
 	}
 
-	@Action(value = "standard_findAll", results = {
-			@Result(name = "success", type = "json") })
+	@Action(value = "standard_findAll", results = { @Result(name = "success", type = "json") })
 	public String findAll() {
-		//获取数据
+		// 获取数据
 		List<Standard> standards = ss.findAll();
-		//转换成json数据
+		// 转换成json数据
 		ActionContext.getContext().getValueStack().push(standards);
 		return SUCCESS;
 	}

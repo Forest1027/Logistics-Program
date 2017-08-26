@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.forest.bos.dao.system.MenuRepository;
 import com.forest.bos.domain.system.Menu;
+import com.forest.bos.domain.system.User;
 import com.forest.bos.service.system.IMenuService;
 
 @Service
@@ -29,5 +30,13 @@ public class MenuServiceImp implements IMenuService{
 			model.setParentMenu(null);
 		}
 		menuRepository.save(model);
+	}
+
+	@Override
+	public List<Menu> findByUser(User user) {
+		if ("admin".equals(user.getUsername())) {
+			return menuRepository.findAll();
+		}
+		return menuRepository.findByUser(user.getId());
 	}
 }

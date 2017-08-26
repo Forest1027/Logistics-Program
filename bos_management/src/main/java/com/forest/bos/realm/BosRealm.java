@@ -22,7 +22,7 @@ import com.forest.bos.service.system.IPermissionService;
 import com.forest.bos.service.system.IRoleService;
 import com.forest.bos.service.system.IUserService;
 
-@Service("bosRealm")
+//@Service("bosRealm")
 public class BosRealm extends AuthorizingRealm{
 	@Autowired
 	private IUserService userService;

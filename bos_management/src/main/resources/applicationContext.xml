@@ -129,4 +129,7 @@
 	
 	<!-- 引入shiro的配置 -->
 	<import resource="applicationContext-shiro.xml"/>
+	
+	<!-- 引入cache配置 -->
+	<import resource="applicationContext-cache.xml"/>
 </beans>

@@ -20,14 +20,36 @@ import org.apache.struts2.convention.annotation.Result;
 @Namespace("/")
 @Controller
 @Scope("prototype")
-public class RoleAction extends BaseAction<Role>{
+public class RoleAction extends BaseAction<Role> {
 	@Autowired
 	private IRoleService roleService;
-	
-	@Action(value="role_list",results={@Result(name="success",type="json")})
+
+	@Action(value = "role_list", results = { @Result(name = "success", type = "json") })
 	public String list() {
 		List<Role> roles = roleService.findAll();
 		ActionContext.getContext().getValueStack().push(roles);
+		return SUCCESS;
+	}
+
+	private String[] permissionIds;
+	private String menuIds;
+
+	public void setRoleService(IRoleService roleService) {
+		this.roleService = roleService;
+	}
+
+	public void setPermissionIds(String[] permissionIds) {
+		this.permissionIds = permissionIds;
+	}
+
+	public void setMenuIds(String menuIds) {
+		this.menuIds = menuIds;
+	}
+
+	@Action(value = "role_save", results = {
+			@Result(name = "success", type = "redirect", location = "/pages/system/role.html") })
+	public String save() {
+		roleService.save(model,permissionIds,menuIds);
 		return SUCCESS;
 	}
 }

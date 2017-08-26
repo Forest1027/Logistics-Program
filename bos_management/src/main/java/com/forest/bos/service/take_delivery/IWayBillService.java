@@ -13,4 +13,6 @@ public interface IWayBillService {
 	public WayBill findByWayBillNum(String wayBillNum);
 
 	public Page<WayBill> pageQuery(WayBill model, Pageable pageable);
+	
+	public void syncIndex();
 }

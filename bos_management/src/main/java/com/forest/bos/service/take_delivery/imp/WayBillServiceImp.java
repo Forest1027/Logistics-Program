@@ -1,5 +1,7 @@
 package com.forest.bos.service.take_delivery.imp;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -8,6 +10,7 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder.Operator;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.query.WildcardQueryBuilder;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,20 +38,31 @@ public class WayBillServiceImp implements IWayBillService {
 		WayBill persistWayBill = repository.findByWayBillNum(wayBill.getWayBillNum());
 		if (persistWayBill == null || persistWayBill.getId() == null) {
 			// 运单不存在
+			wayBill.setWayBillType("1");
 			// 保存运单
 			repository.save(wayBill);
 			// 保存索引
 			indexRepository.save(wayBill);
 		} else {
-			// 运单存在
-			// 将waybill的属性给到persist
-			Integer id = persistWayBill.getId();
-			BeanUtils.copyProperties(wayBill, persistWayBill);
-			persistWayBill.setId(id);
-			// 保存运单
-			repository.save(persistWayBill);
-			// 保存索引
-			indexRepository.save(wayBill);
+			try {
+				// 运单存在
+				if("1".equals(wayBill.getWayBillType())) {
+					// 将waybill的属性给到persist
+					Integer id = persistWayBill.getId();
+					BeanUtils.copyProperties(wayBill, persistWayBill);
+					persistWayBill.setId(id);
+					// 保存运单
+					repository.save(persistWayBill);
+					// 保存索引
+					indexRepository.save(wayBill);
+				}else {
+					throw new RuntimeException("运单已发出，无法再修改");
+				}
+			} catch (BeansException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
 	}
 
@@ -116,6 +130,13 @@ public class WayBillServiceImp implements IWayBillService {
 		SearchQuery nativeSearchQuery = new NativeSearchQuery(query);
 		nativeSearchQuery.setPageable(pageable);
 		return indexRepository.search(nativeSearchQuery);
+	}
+
+	@Override
+	public void syncIndex() {
+		// TODO Auto-generated method stub
+		List<WayBill> wayBills = repository.findAll();
+		indexRepository.save(wayBills);
 	}
 
 }
