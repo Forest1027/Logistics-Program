@@ -7,6 +7,7 @@
 		<!-- 导入jquery核心类库 -->
 		<script type="text/javascript" src="../../js/jquery-1.8.3.js"></script>
 		<!-- 导入easyui类库 -->
+		<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=4IU3oIAMpZhfWZsMu7xzqBBAf6vMHcoa"></script>
 		<link rel="stylesheet" type="text/css" href="../../js/easyui/themes/default/easyui.css">
 		<link rel="stylesheet" type="text/css" href="../../js/easyui/themes/icon.css">
 		<link rel="stylesheet" type="text/css" href="../../js/easyui/ext/portal.css">
@@ -15,6 +16,21 @@
 		<script type="text/javascript" src="../../js/easyui/ext/jquery.portal.js"></script>
 		<script type="text/javascript" src="../../js/easyui/ext/jquery.cookie.js"></script>
 		<script src="../../js/easyui/locale/easyui-lang-zh_CN.js" type="text/javascript"></script>
+		<style type="text/css">
+			body,
+			html {
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				font-family: "微软雅黑";
+			}
+			
+			#allmap {
+				height: 100%;
+				width: 100%;
+			}
+		</style>
+
 		<script type="text/javascript">
 			$(function() {
 				// 先将body隐藏，再显示，不会出现页面刷新效果
@@ -27,7 +43,30 @@
 					text: '出入库',
 					iconCls: 'icon-add',
 					handler: function() {
-						$("#inoutstoreWindow").window('open');
+						//判断是否选中一条记录
+						var row = $("#transitGrid").datagrid('getSelected');
+						if(row == null) {
+							$.messager.alert('警告', '请选择并只能选择一条数据', 'warning');
+							return;
+						}
+						//判断状态
+						/*<input type="hidden" name="id" id="inOutStoreId" />
+								<span id="inOutTransitInfoView"></span>*/
+						if(row.status == "出入库中转") {
+							$("#inOutStoreId").val(row.id);
+							//回显运输配送信息
+							$("#inOutTransitInfoView").append("运单号：" + row.wayBill.wayBillNum + "<br/>");
+							$("#inOutTransitInfoView").append("货物类型：" + row.wayBill.goodsType + "<br/>");
+							$("#inOutTransitInfoView").append("发货地：" + row.wayBill.sendAddress + "<br/>");
+							$("#inOutTransitInfoView").append("收货地：" + row.wayBill.recAddress + "<br/>");
+							$("#inOutTransitInfoView").append("物流信息：" + row.transferInfo + "<br/>");
+
+							//显示窗口
+							$("#inoutstoreWindow").window('open');
+						}else {
+							$.messager.alert("警告","进行出入库操作，必须操作出入库中转运单","warning");
+						}
+
 					}
 				}, {
 					id: 'button-delivery',
@@ -48,8 +87,36 @@
 					text: '运输路径',
 					iconCls: 'icon-search',
 					handler: function() {
+						//获取选中的运单行
+						var row = $("#transitGrid").datagrid('getSelected');
+						if(row == null) {
+							$.messager.alert('警告', '请选择并只能选择一条数据', 'warning');
+							return;
+						}
+						//显示地图
+						// 百度地图API功能
+						var map = new BMap.Map("allmap");
+						map.centerAndZoom('北京', 11);
+						map.enableScrollWheelZoom(true);
+
+						//三种驾车策略：最少时间，最短距离，避开高速
+						var routePolicy = [BMAP_DRIVING_POLICY_LEAST_TIME, BMAP_DRIVING_POLICY_LEAST_DISTANCE, BMAP_DRIVING_POLICY_AVOID_HIGHWAYS];
+						var start = row.wayBill.sendAddress;
+						alert(start);
+						var end = row.wayBill.recAddress;
+						alert(end);
+
+						var driving = new BMap.DrivingRoute(map, {
+							renderOptions: {
+								map: map,
+								autoViewport: true
+							},
+							policy: routePolicy[0]
+						});
+						driving.search(start, end);
 						// 弹出窗口
 						$("#transitPathWindow").window('open');
+
 					}
 				}, {
 					id: 'button-path',
@@ -128,7 +195,7 @@
 				// 运输配送管理 表格定义 
 				$('#transitGrid').datagrid({
 					iconCls: 'icon-forward',
-					url: '../../data/transit.json',
+					url: '../../transit_pageQuery.action',
 					fit: true,
 					border: false,
 					rownumbers: true,
@@ -140,7 +207,13 @@
 					toolbar: transitToolbar,
 					columns: transitColumns
 				});
-
+				
+				//出入库表单保存
+				$("#inoutStoreSave").click(function() {
+					if($("#inoutStoreForm").form("validate")) {
+						$("#inoutStoreForm").submit();
+					}
+				})
 			});
 		</script>
 	</head>
@@ -158,7 +231,7 @@
 				</div>
 			</div>
 			<div region="center" style="overflow:auto;padding:5px;" border="false">
-				<form id="inoutStoreForm" method="post" action="">
+				<form id="inoutStoreForm" method="post" action="../../inoutstore_save.action">
 					<table class="table-edit" width="80%" align="center">
 						<tr class="title">
 							<td colspan="2">入库操作</td>
@@ -167,12 +240,12 @@
 							<td>运单信息</td>
 							<td>
 								<input type="hidden" name="id" id="inOutStoreId" />
-								<span id="transitInfoView"></span>
+								<span id="inOutTransitInfoView"></span>
 						</tr>
 						<tr>
 							<td>操作</td>
 							<td>
-								<select name="operation" class="easyui-combobox">
+								<select name="operation" class="easyui-combobox" id="operationSelect">
 									<option value="入库">入库</option>
 									<option value="出库">出库</option>
 									<option value="到达网点">到达网点</option>
@@ -212,7 +285,7 @@
 							<td>运单信息</td>
 							<td>
 								<input type="hidden" name="id" id="deliveryId" />
-								<span id="transitInfoView"></span>
+								<span id="deliveryTransitInfoView"></span>
 						</tr>
 						<tr>
 							<td>快递员工号</td>
@@ -253,7 +326,7 @@
 							<td>运单信息</td>
 							<td>
 								<input type="hidden" name="id" id="deliveryId" />
-								<span id="transitInfoView"></span>
+								<span id="signTransitInfoView"></span>
 						</tr>
 						<tr>
 							<td>签收人</td>
@@ -295,6 +368,7 @@
 		</div>
 
 		<div class="easyui-window" title="运输路径查看" id="transitPathWindow" modal="true" closed="true" collapsible="false" minimizable="false" maximizable="false" style="top:20px;left:100px;width: 800px; height: 400px">
+			<div id="allmap"></div>
 		</div>
 
 		<div class="easyui-window" title="实时配送路径" id="deliveryInTimePathWindow" modal="true" closed="true" collapsible="false" minimizable="false" maximizable="false" style="top:20px;left:100px;width: 800px; height:400px">

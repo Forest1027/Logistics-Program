@@ -13,6 +13,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 
+import org.springframework.data.annotation.Transient;
+
 import com.forest.bos.domain.take_delivery.WayBill;
 
 /**
@@ -104,6 +106,24 @@ public class TransitInfo {
 
 	public void setOutletAddress(String outletAddress) {
 		this.outletAddress = outletAddress;
+	}
+	
+	@Transient
+	public String getTransferInfo() {
+		StringBuilder sb = new StringBuilder();
+		//添加出入库信息
+		for (InOutStorageInfo inOutStorageInfo : inOutStorageInfos) {
+			sb.append(inOutStorageInfo.getDescription()+"<br/>");
+		}
+		//添加配送信息
+		if (deliveryInfo!=null) {
+			sb.append(deliveryInfo);
+		}
+		//添加签收信息
+		if (signInfo!=null) {
+			sb.append(signInfo);
+		}
+		return sb.toString();
 	}
 
 }

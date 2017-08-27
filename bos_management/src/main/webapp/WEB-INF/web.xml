@@ -4,6 +4,16 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	id="WebApp_ID" version="2.5">
 
+	<!-- 懒加载解决 -->
+	<filter>
+		<filter-name>OpenEntityManagerInView</filter-name>
+		<filter-class>org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>OpenEntityManagerInView</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 	<!-- spring配置文件位置 -->
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
@@ -50,5 +60,5 @@
 		<filter-name>struts2Filter</filter-name>
 		<url-pattern>*.action</url-pattern>
 	</filter-mapping>
-	
+
 </web-app>
