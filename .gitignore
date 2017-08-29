@@ -1,0 +1,7 @@
+/bos_management/target
+/bos_management/src/main/webapp/a_layout.html
+/bos_management/src/test
+/crm_domain/*.gitignore
+/crm_management/.gitignore
+/bos_fore/target
+/bos_fore/src/main/webapp/angularjsdemo

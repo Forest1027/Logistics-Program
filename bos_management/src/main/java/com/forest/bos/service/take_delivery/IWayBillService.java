@@ -1,5 +1,7 @@
 package com.forest.bos.service.take_delivery;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,4 +17,6 @@ public interface IWayBillService {
 	public Page<WayBill> pageQuery(WayBill model, Pageable pageable);
 	
 	public void syncIndex();
+
+	public List<WayBill> findWayBills(WayBill model);
 }

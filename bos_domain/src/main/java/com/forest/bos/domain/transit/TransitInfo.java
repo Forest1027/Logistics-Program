@@ -117,11 +117,11 @@ public class TransitInfo {
 		}
 		//添加配送信息
 		if (deliveryInfo!=null) {
-			sb.append(deliveryInfo);
+			sb.append(deliveryInfo.getDescription());
 		}
 		//添加签收信息
 		if (signInfo!=null) {
-			sb.append(signInfo);
+			sb.append(signInfo.getDescription());
 		}
 		return sb.toString();
 	}

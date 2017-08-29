@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.forest.bos.dao.index.WayBillIndexRepository;
 import com.forest.bos.dao.take_delivery.WayBillRepository;
 import com.forest.bos.dao.transit.TransitinfoRepository;
 import com.forest.bos.domain.take_delivery.WayBill;
@@ -21,6 +22,9 @@ public class TransitinfoServiceImp implements ITransitinfoService{
 	
 	@Autowired
 	private TransitinfoRepository transitinfoRepository;
+	
+	@Autowired
+	private WayBillIndexRepository wayBillIndexRepository;
 
 	@Override
 	public void create(String wayBillIds) {
@@ -38,6 +42,9 @@ public class TransitinfoServiceImp implements ITransitinfoService{
 					
 					//将waybill的状态改变
 					wayBill.setWayBillType("2");
+					
+					//更新索引库
+					wayBillIndexRepository.save(wayBill);
 				}
 			}
 		}
