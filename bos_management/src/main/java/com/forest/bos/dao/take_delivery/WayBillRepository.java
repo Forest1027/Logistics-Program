@@ -11,6 +11,4 @@ public interface WayBillRepository extends JpaRepository<WayBill, Integer>,JpaSp
 
 	public WayBill findByWayBillNum(String wayBillNum);
 
-	public List<WayBill> findWayBills(WayBill model);
-
 }

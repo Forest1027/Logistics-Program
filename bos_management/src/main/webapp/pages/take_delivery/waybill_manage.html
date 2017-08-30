@@ -75,9 +75,14 @@
 					}
 
 				})
-				
+
 				$("#exportExlsBtn").click(function() {
-					$("#report_exportExls").submit();
+					$("#searchForm").attr("action","../../report_exportExls.action");
+					$("#searchForm").submit();
+				})
+				$("#exportPdfBtn").click(function() {
+					$("#searchForm").attr("action","../../report_exportPdf.action");
+					$("#searchForm").submit();
 				})
 			});
 		</script>
@@ -95,8 +100,9 @@
 			<a id="help" icon="icon-print" href="#" class="easyui-linkbutton" plain="true">打印工作单</a>
 			<a id="transitBtn" icon="icon-edit" href="#" class="easyui-linkbutton" plain="true">开始中转配送</a>
 			<a id="exportExlsBtn" icon="icon-print" href="#" class="easyui-linkbutton" plain="true">导出Excel报表</a>
+			<a id="exportPdfBtn" icon="icon-print" href="#" class="easyui-linkbutton" plain="true">导出PDF报表</a>
 			<br />
-			<form id="searchForm" action="../../report_exportExls.action">
+			<form id="searchForm">
 				运单号：<input name="wayBillNum" style="line-height:26px;border:1px solid #ccc"> 发货地：
 				<input name="sendAddress" style="line-height:26px;border:1px solid #ccc"> 收货地：
 				<input name="recAddress" style="line-height:26px;border:1px solid #ccc">

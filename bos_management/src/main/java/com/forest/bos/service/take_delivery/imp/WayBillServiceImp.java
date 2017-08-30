@@ -13,6 +13,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
@@ -46,7 +47,7 @@ public class WayBillServiceImp implements IWayBillService {
 		} else {
 			try {
 				// 运单存在
-				if("1".equals(wayBill.getWayBillType())) {
+				if ("1".equals(wayBill.getWayBillType())) {
 					// 将waybill的属性给到persist
 					Integer id = persistWayBill.getId();
 					BeanUtils.copyProperties(wayBill, persistWayBill);
@@ -55,14 +56,14 @@ public class WayBillServiceImp implements IWayBillService {
 					repository.save(persistWayBill);
 					// 保存索引
 					indexRepository.save(wayBill);
-				}else {
+				} else {
 					throw new RuntimeException("运单已发出，无法再修改");
 				}
 			} catch (BeansException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		}
 	}
 
@@ -137,6 +138,63 @@ public class WayBillServiceImp implements IWayBillService {
 		// TODO Auto-generated method stub
 		List<WayBill> wayBills = repository.findAll();
 		indexRepository.save(wayBills);
+	}
+
+	@Override
+	public List<WayBill> findWayBills(WayBill model) {
+		if (StringUtils.isBlank(model.getWayBillNum()) && StringUtils.isBlank(model.getSendAddress())
+				&& StringUtils.isBlank(model.getRecAddress()) && StringUtils.isBlank(model.getSendProNum())
+				&& (model.getSignStatus() == null || model.getSignStatus() == 0)) {
+			return repository.findAll();
+		}
+		BoolQueryBuilder query = new BoolQueryBuilder();
+		// 添加条件
+		if (StringUtils.isNoneBlank(model.getWayBillNum())) {
+			// 等值查询
+			QueryBuilder termQueryBuilder = new TermQueryBuilder("wayBillNum", model.getWayBillNum());
+			query.must(termQueryBuilder);
+		}
+		if (StringUtils.isNoneBlank(model.getSendAddress())) {
+			// 模糊查询
+			// 情况一：输入的值是词条的一部分，因此使用模糊查询
+			QueryBuilder wildcardQueryBuilder1 = new WildcardQueryBuilder("sendAddress",
+					"*" + model.getSendAddress() + "*");
+			// 情况二：输入的值比较完整，包含词条-->先切分
+			QueryBuilder defaultOperator = new QueryStringQueryBuilder(model.getSendAddress()).field("sendAddress")
+					.defaultOperator(Operator.AND);
+
+			// 两种情况取或
+			BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+			boolQueryBuilder.should(wildcardQueryBuilder1);
+			boolQueryBuilder.should(defaultOperator);
+
+			query.must(boolQueryBuilder);
+		}
+		if (StringUtils.isNoneBlank(model.getRecAddress())) {
+			// 模糊查询
+			QueryBuilder wildcardQueryBuilder2 = new WildcardQueryBuilder("recAddress",
+					"*" + model.getRecAddress() + "*");
+			// 情况二：输入的值比较完整，包含词条-->先切分
+			QueryBuilder defaultOperator = new QueryStringQueryBuilder(model.getRecAddress()).field("recAddress")
+					.defaultOperator(Operator.AND);
+
+			BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+			boolQueryBuilder.should(wildcardQueryBuilder2);
+			boolQueryBuilder.should(defaultOperator);
+			query.must(boolQueryBuilder);
+		}
+		if (StringUtils.isNoneBlank(model.getSendProNum())) {
+			QueryBuilder termQueryBuilder2 = new TermQueryBuilder("sendProNum", model.getSendProNum());
+			query.must(termQueryBuilder2);
+		}
+		if (model.getSignStatus() != null && model.getSignStatus() != 0) {
+			QueryBuilder termQueryBuilder3 = new TermQueryBuilder("signStatus", model.getSignStatus());
+			query.must(termQueryBuilder3);
+		}
+		SearchQuery nativeSearchQuery = new NativeSearchQuery(query);
+		Pageable pageable = new PageRequest(0, Integer.MAX_VALUE);
+		nativeSearchQuery.setPageable(pageable);
+		return indexRepository.search(nativeSearchQuery).getContent();
 	}
 
 }
